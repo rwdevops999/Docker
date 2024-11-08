@@ -1,0 +1,23 @@
+###################################################
+# Stage: base
+# 
+# This base stage ensures all other stages are using the same base image
+# and provides common configuration for all stages, such as the working dir.
+###################################################
+
+## Take the ECLIPSE TEMURIN Image as base image (it includes JDK)
+FROM node:18-alpine AS base
+
+## create a directory for our application code
+RUN mkdir -p /app
+
+WORKDIR /app
+
+COPY ./ ./
+COPY tutorial_env.json ./src/tutorial_env.json
+
+RUN npm install --silent
+
+CMD npm start;
+
+# CMD sleep infinity;

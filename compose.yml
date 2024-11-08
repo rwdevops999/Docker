@@ -1,0 +1,105 @@
+name: skeleton
+
+services:
+  ###################################################
+  # Service: Reverse Proxy
+  ###################################################
+  proxy:
+    image: traefik:v2.11
+    container_name: proxy
+    command: --providers.docker
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  # proxy:
+  #   image: traefik:v2.11
+  #   container_name: proxy
+  #   command:
+  #     - "--providers.docker=true"
+  #     - "--entrypoints.postgres.address=:5432"
+  #   ports:
+  #     - 80:80 # backend and frontend
+  #     - 5432:5432 # postgres
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+
+  ###################################################
+  # Service: database
+  ###################################################
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_DB=tutopedia_db
+      - POSTGRES_USER=postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    labels:
+      - "traefik.enable=true"
+      # routers
+      - "traefik.tcp.routers.postgres.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.postgres.entryPoints=postgres"
+      - "traefik.tcp.routers.postgres.service=postgres"
+      # services (needed for TCP)
+      - "traefik.tcp.services.postgres.loadbalancer.server.port=5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+
+  liquibase:
+    image: liquibase
+    container_name: liquibase
+    volumes:
+      - /Users/rudiwelter/Workdir/Skeleton/db/:/db/
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: --url=jdbc:postgresql://postgres:5432/tutopedia_db --search-path=/db/local/ --changeLogFile=db.changelog-master.xml --username=postgres --password=admin update
+    # command: /bin/bash -c "sleep infinity"
+    # labels:
+    #   - "traefik.enable=true"
+
+  ###################################################
+  # Service: backend
+  ###################################################
+  backend:
+    image: backend
+    container_name: backend
+    build:
+      context: Backend
+      dockerfile: Dockerfile.backend
+    # ports:
+    #   - 8080:8080
+    environment:
+      - db_user=postgres
+      - db_password=admin
+      - db_host=postgres
+      - db_port=5432
+      - db_database=tutopedia_db
+    labels:
+      traefik.http.routers.backend.rule: Host(`localhost`) && PathPrefix(`/api`)
+      traefik.http.services.backend.loadbalancer.server.port: 8080
+
+  ###################################################
+  # Service: backend
+  ###################################################
+  frontend:
+    image: frontend
+    container_name: frontend
+    build:
+      context: Frontend
+      dockerfile: Dockerfile.frontend
+    labels:
+      traefik.http.routers.client.rule: Host(`localhost`)
+      traefik.http.services.client.loadbalancer.server.port: 3000
+
+volumes:
+  postgres:
