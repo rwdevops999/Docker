@@ -144,6 +144,8 @@ depends_on:
 
 ### traefik
 
+(when traefik and postgres are in same docker compose file)
+
 labels:
 // enable traefik on Postgres directly
 
@@ -156,6 +158,10 @@ labels:
   // set routing using TCP
 
 - "traefik.tcp.routers.postgres.entrypoints=tcp"
+
+  // Set routing to postgres
+
+- "traefik.tcp.routers.postgres.service=postgres"
 
   // Redirect everything traefik receives on port 5432 to Postgres at port 5432
 
