@@ -1,1 +1,109 @@
-# Docker
+# Docker Compose File
+
+For running multi-container applications.
+
+## version (OPTIONAL)
+
+Only for backward compatibility.
+
+## name
+
+Project name
+The value is set also as COMPOSE_PROJECT_NAME for further use.
+
+## services
+
+Map where the keys are the service names.
+
+```docker-compose.yml
+services:
+    web:
+        ...
+    db:
+        ...
+```
+
+### servicename:
+
+#### image
+
+The image to start the container from.
+
+#### container-name:
+
+A custom container name.
+
+#### command
+
+Override the container default command (CMD).
+
+#### ports
+
+Port mapping between the machone and the container. Allows external access to the service from outside the container.
+(HOST:CONTAINER).
+
+#### volumes
+
+Mounts host paths (or named volumes) that are accessible by the service container.
+(HOST VOLUME:CONTAINER PATH).
+
+#### restart
+
+The policy on container termination.
+
+> > > always: always restart the container until it is removed.
+
+#### environment
+
+Defines environment variables set in the container.
+
+#### labels
+
+Metadata for the container.
+
+```docker-compose.yml
+- "key=value"
+
+e.g.
+
+- "traefik.enable=true"
+```
+
+#### healthcheck
+
+Declares a check that's run to determine whether the container is healthy.
+
+#### depends_on
+
+Controls the order of service startup (and shutdown).
+Useful if services are closely coupled.
+
+## volumes
+
+Persistent data store (named volumes) that can be used by a service.
+
+# TUT-O-PEDIA
+
+## proxy (traefik)
+
+HTTP Reverse Proxy for integrating components (services). A reverse proxy is a server, app, or cloud service that sits in front of one or more services to intercept and inspect incoming client requests before forwarding them to the service and subsequently returning the service's response to the client.
+
+Traefik Dashboard: http://localhost:8080
+
+Traefik inspects the services to set-up the right configuration.
+
+## postgres
+
+Object-Relational Database Management System (ORDBMS). Database Server;
+
+## liquibase
+
+Database Schema Change Management solution.
+
+## backend
+
+Tut-O-Pedia backend API based on SpringBoot - Rest
+
+## frontend
+
+Tut-O-Pedia frontend application based on React.

@@ -1,4 +1,4 @@
-name: skeleton
+name: tutopedia
 
 services:
   ###################################################
@@ -12,17 +12,6 @@ services:
       - 80:80
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-  # proxy:
-  #   image: traefik:v2.11
-  #   container_name: proxy
-  #   command:
-  #     - "--providers.docker=true"
-  #     - "--entrypoints.postgres.address=:5432"
-  #   ports:
-  #     - 80:80 # backend and frontend
-  #     - 5432:5432 # postgres
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
 
   ###################################################
   # Service: database
@@ -58,26 +47,18 @@ services:
     image: liquibase
     container_name: liquibase
     volumes:
-      - /Users/rudiwelter/Workdir/Skeleton/db/:/db/
+      - /Users/rudiwelter/Workdir/Tut-O-Pedia/Backend/src/main/resources/db/:/db/
     depends_on:
       postgres:
         condition: service_healthy
-    command: --url=jdbc:postgresql://postgres:5432/tutopedia_db --search-path=/db/local/ --changeLogFile=db.changelog-master.xml --username=postgres --password=admin update
-    # command: /bin/bash -c "sleep infinity"
-    # labels:
-    #   - "traefik.enable=true"
+    command: --url=jdbc:postgresql://postgres:5432/tutopedia_db --search-path=/db/ --changeLogFile=db.changelog-master.xml --username=postgres --password=admin update
 
   ###################################################
   # Service: backend
   ###################################################
   backend:
-    image: backend
+    image: rwdevops999/topbackend
     container_name: backend
-    build:
-      context: Backend
-      dockerfile: Dockerfile.backend
-    # ports:
-    #   - 8080:8080
     environment:
       - db_user=postgres
       - db_password=admin
@@ -86,20 +67,17 @@ services:
       - db_database=tutopedia_db
     labels:
       traefik.http.routers.backend.rule: Host(`localhost`) && PathPrefix(`/api`)
-      traefik.http.services.backend.loadbalancer.server.port: 8080
+      traefik.http.services.backend.loadbalancer.server.port: 8081
 
   ###################################################
-  # Service: backend
+  # Service: frontend
   ###################################################
   frontend:
-    image: frontend
+    image: rwdevops999/topfrontend
     container_name: frontend
-    build:
-      context: Frontend
-      dockerfile: Dockerfile.frontend
     labels:
       traefik.http.routers.client.rule: Host(`localhost`)
-      traefik.http.services.client.loadbalancer.server.port: 3000
+      traefik.http.services.client.loadbalancer.server.port: 5173
 
 volumes:
   postgres:
