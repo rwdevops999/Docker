@@ -96,6 +96,71 @@ Traefik inspects the services to set-up the right configuration.
 
 Object-Relational Database Management System (ORDBMS). Database Server;
 
+### postgres Environment Variables
+
+- POSTGRES_PASSWORD (required) sets the superuser (defined by POSTGRES_USER) password.
+- POSTGRES_USER (optional, default: postgres) becomes the superuser.
+- POSTGRES_DB (optional, default: postgres) the name of the default database.
+- POSTGRES_HOST_AUTH_METHOD (optional) controls auth-method for all databases and all users.
+  - trust: allow the connection unconditionally. Allows anyone that can connect to log in without need of password. PostgreSQL assumes that anyone who can connect to the server is authorized to access the database with whatever database user name they specify.
+  - password: the client must provide an unencrypted password for authentication.
+
+### volume
+
+A named volume to /var/lib/postgresql/data
+
+```docker-compose.yml
+postgres:
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+volumes:
+  postgres:
+```
+
+### port
+
+Postgres works on port 5432.
+
+### healtcheck
+
+healthcheck:
+test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+// Command pg_isready -d db_prod -> specifies the name of the database to connect to
+interval: 10s
+// The interval between the health checks (in seconds)
+timeout: 5s
+// The maximum number of seconds to wait when attempting connection before returning that the server is not responding
+retries: 5
+// THe max number of retries before giving up.
+start_period: 30s
+// Provides initialization time for containers that need time to bootstrap.
+
+```docker-compose.yml
+depends_on:
+    postgres:
+        condition: service_healthy
+```
+
+### traefik
+
+labels:
+// enable traefik on Postgres directly
+
+- "traefik.enable=true"
+
+  // set entrypoint rule to TCP \_ (for TCP (or all TLS connections) use HostSNI= Host Server Name Indication)
+
+- "traefik.tcp.routers.postgres.rule=HostSNI(`_`)"
+
+  // set routing using TCP
+
+- "traefik.tcp.routers.postgres.entrypoints=tcp"
+
+  // Redirect everything traefik receives on port 5432 to Postgres at port 5432
+
+- "traefik.tcp.services.postgres.loadbalancer.server.port=5432"
+
 ## liquibase
 
 Database Schema Change Management solution.
