@@ -92,9 +92,21 @@ Traefik Dashboard: http://localhost:8080
 
 Traefik inspects the services to set-up the right configuration.
 
+### image file (on DockerHub)
+
+### command
+
+### ports
+
+### volumes
+
 ## postgres
 
 Object-Relational Database Management System (ORDBMS). Database Server;
+
+### image file (on DockerHub)
+
+postgres
 
 ### postgres Environment Variables
 
@@ -142,7 +154,7 @@ depends_on:
         condition: service_healthy
 ```
 
-### traefik
+### traefik settings
 
 (when traefik and postgres are in same docker compose file)
 
@@ -171,10 +183,28 @@ labels:
 
 Database Schema Change Management solution.
 
+### image file (on DockerHub)
+
+### volume
+
+### depends_on
+
+### command
+
 ## backend
 
 Tut-O-Pedia backend API based on SpringBoot - Rest
 
+### image file (on DockerHub)
+
+### environment Variables
+
+### traefik settings
+
 ## frontend
+
+### image file (on DockerHub)
+
+### traefik settings
 
 Tut-O-Pedia frontend application based on React.
