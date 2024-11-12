@@ -67,7 +67,23 @@ services:
       - db_host=postgres
       - db_port=5432
       - db_database=tutopedia_db
+    ports:
+      - 8081:8081
+    labels:
+      traefik.http.routers.backend.rule: Host(`localhost`) && PathPrefix(`/api`)
+      traefik.http.services.backend.loadbalancer.server.port: 8081
+    volumes:
+      - ~/.oci/:/root/.oci/
     # command: /bin/bash -c "sleep infinity"
+    depends_on:
+      liquibase:
+        condition: service_completed_successfully
+
+    command: /bin/bash -c "
+      echo "BACKEND" &&
+      export spring_profiles_active=dev &&
+      ./mvnw spring-boot:run
+      "
 
   # frontend:
 
