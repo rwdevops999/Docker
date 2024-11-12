@@ -79,13 +79,24 @@ services:
       liquibase:
         condition: service_completed_successfully
 
-    command: /bin/bash -c "
+    command: /bin/bash -c \"
       echo "BACKEND" &&
       export spring_profiles_active=dev &&
       ./mvnw spring-boot:run
-      "
+      \"
 
-  # frontend:
+  frontend:
+    image: rwdevops999/topfrontend
+    container_name: frontend
+    depends_on:
+      backend:
+        condition: service_started
+
+    ports:
+      - 5173:5173
+    labels:
+      traefik.http.routers.client.rule: Host(`localhost`)
+      traefik.http.services.client.loadbalancer.server.port: 5173
 
 volumes:
   postgres:
