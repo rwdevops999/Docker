@@ -1,3 +1,5 @@
+@library("shared-library@main") _
+
 pipeline {
     agent{
         label "macos"
