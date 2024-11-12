@@ -1,43 +1,47 @@
 name: tutopedia
 
 services:
-  ###################################################
-  # Service: Reverse Proxy
-  ###################################################
   proxy:
     image: traefik:v2.11
     container_name: proxy
-    command: --providers.docker
+    command:
+      - --providers.docker=true
+      - --api=true
+      - --api.dashboard=true
+      - --api.insecure=true
     ports:
       - 80:80
+      - 8080:8080
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "traefik.enable=true"
 
-  ###################################################
-  # Service: database
-  ###################################################
   postgres:
     image: postgres
     container_name: postgres
+    depends_on:
+      - proxy
     restart: always
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
       - POSTGRES_DB=tutopedia_db
+      - POSTGRES_PASSWORD=admin
       - POSTGRES_USER=postgres
     ports:
       - 5432:5432
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - postgres:/var/lib/postgres/data
     labels:
       - "traefik.enable=true"
       # routers
-      - "traefik.tcp.routers.postgres.rule=HostSNI(`*`)"
-      - "traefik.tcp.routers.postgres.entryPoints=postgres"
-      - "traefik.tcp.routers.postgres.service=postgres"
+      # - "traefik.tcp.routers.postgres.rule=HostSNI(`*`)"
+      # - "traefik.tcp.routers.postgres.entrypoints=tcp"
+      # - "traefik.tcp.routers.postgres.service=postgres"
       # services (needed for TCP)
-      - "traefik.tcp.services.postgres.loadbalancer.server.port=5432"
+      # - "traefik.tcp.services.postgres.loadbalancer.server.port=5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+      test: ["CMD-SHELL", "pg_isready -d tutopedia_db -U postgres"]
       interval: 30s
       timeout: 60s
       retries: 5
@@ -51,11 +55,9 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    # command: /bin/bash -c "sleep infinity"
     command: --url=jdbc:postgresql://postgres:5432/tutopedia_db --search-path=/db/ --changeLogFile=db.changelog-master.xml --username=postgres --password=admin update
 
-  ###################################################
-  # Service: backend
-  ###################################################
   backend:
     image: rwdevops999/topbackend
     container_name: backend
@@ -65,19 +67,9 @@ services:
       - db_host=postgres
       - db_port=5432
       - db_database=tutopedia_db
-    labels:
-      traefik.http.routers.backend.rule: Host(`localhost`) && PathPrefix(`/api`)
-      traefik.http.services.backend.loadbalancer.server.port: 8081
+    # command: /bin/bash -c "sleep infinity"
 
-  ###################################################
-  # Service: frontend
-  ###################################################
-  frontend:
-    image: rwdevops999/topfrontend
-    container_name: frontend
-    labels:
-      traefik.http.routers.client.rule: Host(`localhost`)
-      traefik.http.services.client.loadbalancer.server.port: 5173
+  # frontend:
 
 volumes:
   postgres:

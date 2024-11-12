@@ -8,13 +8,41 @@ We use in docker-compose a static configuration (in docker-compose.yml). Attach 
 
 The '--providers.docker' option enables the docker provider
 
-## Routers
+```docker-compose.yml
+// USE DOCKER AS A PROVIDER
+--providers.docker=true
 
-A router is in charge of routing incoming requests to the service that handles them.
+// WORK WITH LABELS
+services:
+  my-container:
+    # ...
+    labels:
+        - traefik.http.routers.my-container.rule=Host(`example.com`)
+```
+
+## Labels
+
+// Attaching labels to containers
+services:
+my-container: # ...
+labels: - traefik.http.routers.my-container.rule=Host(`example.com`)
+
+// Forward requests for http://example.com to http://<private IP of container>:12345
+services:
+my-container: # ...
+labels: - traefik.http.routers.my-container.rule=Host(`example.com`) # Tell Traefik to use the port 12345 to connect to `my-container` - traefik.http.services.my-service.loadbalancer.server.port=12345
+
+By default, Traefik uses the first exposed port of a container.
+Setting the label traefik.http.services.xxx.loadbalancer.server.port overrides that behavior.
 
 ## Entrypoints
 
 Are the network entrypoints into T. They define the port that receives the packets and listen for TCP OR UDP.
+Entrypoints are in the most basic form just a port number.
+
+## Routers
+
+A router is in charge of routing incoming requests to the service that handles them. The router analyses the request.
 
 ## docker setup
 
