@@ -1,0 +1,22 @@
+pipeline {
+    agent{
+        label "macos"
+    }
+    stages {
+        stage("Build Docker") {
+            steps {
+                sh '''
+                    docker compose down
+                '''
+            }
+        }
+    }
+    post{
+        success{
+    	    mailTo(to: 'rudi.welter@gmail.com', attachLog: false)
+        }
+        failure{
+    	    mailTo(to: 'rudi.welter@gmail.com', attachLog: true)
+        }
+    }
+}
