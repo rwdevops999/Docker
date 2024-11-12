@@ -2,7 +2,18 @@ pipeline {
     agent{
         label "macos"
     }
+
+    environment {
+    	PATH = "/Applications/Docker.app/Contents/Resources/bin:${env.PATH}"
+    }
+
     stages {
+        stage("info") {
+			steps {
+			    sh 'docker -v'
+			}
+		}
+
         stage("Build Docker") {
             steps {
                 sh '''
