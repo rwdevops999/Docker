@@ -1,4 +1,4 @@
-@library("shared-library@1.0") _
+@Library("shared-library@master") _
 
 pipeline {
     agent{
@@ -19,30 +19,26 @@ pipeline {
 
         stage("Docker Down") {
             when {
-                expression {
-                    ${COMPOSE_VALUE} === "DOWN"
-                }
+                expression { env.COMPOSE_VALUE == "DOWN" }
             }
 
             steps {
                 sh '''
                     echo 'DOCKER DOWN'
-                    // docker compose down
+                    docker compose down
                 '''
             }
         }
 
         stage("Docker Up") {
             when {
-                expression {
-                    ${COMPOSE_VALUE} === "UP"
-                }
+                expression { env.COMPOSE_VALUE == "UP" }
             }
 
             steps {
                 sh '''
                     echo 'DOCKER UP'
-                    // docker compose up
+                    docker compose up
                 '''
             }
         }
