@@ -38,7 +38,7 @@ pipeline {
             steps {
                 sh '''
                     echo 'DOCKER UP'
-                    docker compose up
+                    docker compose up -d
                 '''
             }
         }
