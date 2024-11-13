@@ -1,12 +1,4 @@
-@library("shared-library@main") _
-
-def getCompose() {
-    if(params.COMPOSE) {
-        return params.COMPOSE;
-    } else {
-        return "DOWN";
-    }
-}
+@library("shared-library") _
 
 pipeline {
     agent{
