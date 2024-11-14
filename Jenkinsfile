@@ -49,7 +49,7 @@ pipeline {
             }
             
             steps {
-                sh "./servercheck"
+                sh `./servercheck`
             }
         }
     }
