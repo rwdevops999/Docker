@@ -49,7 +49,10 @@ pipeline {
             }
             
             steps {
-                sh './servercheck'
+                sh '''
+                    chmod 777 servercheck
+                    ./servercheck
+                '''
             }
         }
     }
