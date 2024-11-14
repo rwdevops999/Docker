@@ -25,7 +25,7 @@ pipeline {
             steps {
                 sh '''
                     echo 'DOCKER DOWN'
-                    docker compose down
+                    docker compose stop
                 '''
             }
         }
@@ -38,7 +38,7 @@ pipeline {
             steps {
                 sh '''
                     echo 'DOCKER UP'
-                    docker compose up -d
+                    docker compose start
                 '''
             }
         }
