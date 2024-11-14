@@ -49,7 +49,7 @@ pipeline {
             }
             
             steps {
-                checkBackend();
+                while (! checkBackend());
             }
         }
     }
