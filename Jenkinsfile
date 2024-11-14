@@ -42,14 +42,15 @@ pipeline {
                 '''
             }
         }
-    }
 
-    post{
-        success{
-    	    mailTo(to: 'rudi.welter@gmail.com', attachLog: false)
-        }
-        failure{
-    	    mailTo(to: 'rudi.welter@gmail.com', attachLog: true)
+        stage("Docker check") {
+            when {
+                expression { env.COMPOSE_VALUE == "UP" }
+            }
+            
+            steps {
+                checkBackend();
+            }
         }
     }
 }
