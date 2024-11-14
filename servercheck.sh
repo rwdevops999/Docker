@@ -1,7 +1,7 @@
 #!/bin/bash
 url='http://localhost:8081/api/greetings'
 attempts=0
-timeout=10
+timeout=5
 online=false
 
 cont="y"
