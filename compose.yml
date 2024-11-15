@@ -59,7 +59,7 @@ services:
     command: --url=jdbc:postgresql://postgres:5432/tutopedia_db --search-path=/db/ --changeLogFile=db.changelog-master.xml --username=postgres --password=admin update
 
   backend:
-    image: rwdevops999/topbackend
+    image: rwdevops999/topbackend:latest
     container_name: backend
     environment:
       - db_user=postgres
@@ -85,7 +85,7 @@ services:
       ./mvnw spring-boot:run"
 
   frontend:
-    image: rwdevops999/topfrontend
+    image: rwdevops999/topfrontend:latest
     container_name: frontend
     depends_on:
       backend:
