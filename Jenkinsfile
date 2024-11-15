@@ -29,8 +29,8 @@ pipeline {
                 sh '''
                     echo 'DOCKER DOWN'
                     docker compose stop
-                    docker rmi ${USER}/${FRONTEND}:latest
-                    docker rmi ${USER}/${BACKEND}:latest
+                    docker rmi -f ${USER}/${FRONTEND}:latest
+                    docker rmi -f ${USER}/${BACKEND}:latest
                 '''
             }
         }
