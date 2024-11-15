@@ -8,6 +8,9 @@ pipeline {
     environment {
     	PATH = "/Applications/Docker.app/Contents/Resources/bin:${env.PATH}"
         COMPOSE_VALUE = getCompose();
+    	USER = 'rwdevops999'
+    	BACKEND = 'topbackend'
+    	FRONTEND = 'topfrontend'
     }
 
     stages {
@@ -25,7 +28,11 @@ pipeline {
             steps {
                 sh '''
                     echo 'DOCKER DOWN'
-                    docker compose down
+                    docker compose stop
+                    docker rmi ${FRONTEND}:latest
+                    docker rmi ${USER}/${FRONTEND}:latest
+                    docker rmi ${BACKEND}:latest
+                    docker rmi ${USER}/${BACKEND}:latest
                 '''
             }
         }
