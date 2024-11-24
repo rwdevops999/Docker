@@ -81,7 +81,7 @@ services:
         condition: service_completed_successfully
 
     command: /bin/bash -c "echo "BACKEND" &&
-      export spring_profiles_active=dev &&
+      export spring_profiles_active=docker &&
       ./mvnw spring-boot:run"
 
   frontend:
